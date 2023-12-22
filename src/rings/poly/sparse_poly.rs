@@ -395,7 +395,7 @@ impl<R,> DivisibilityRing for SparsePolyRingBase<R>
 }
 
 impl<R> EuclideanRing for SparsePolyRingBase<R> 
-    where R: RingStore, R::Type: Field + CanonicalIso<R::Type>
+    where R: RingStore, R::Type: DivisibilityRing + CanonicalIso<R::Type>
 {
     fn euclidean_div_rem(&self, mut lhs: Self::Element, rhs: &Self::Element) -> (Self::Element, Self::Element) {
         let lc_inv = self.base_ring.invert(rhs.at(self.degree(rhs).unwrap())).unwrap();

@@ -10,6 +10,7 @@
 #![feature(const_type_name)]
 #![feature(fn_traits)]
 #![feature(unboxed_closures)]
+#![feature(fmt_internals)]
 
 #![doc = include_str!("../Readme.md")]
 

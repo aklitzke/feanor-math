@@ -33,6 +33,7 @@ pub fn sparse_poly_div<P, S, F, E>(mut lhs: El<P>, rhs: &El<S>, lhs_ring: P, rhs
                     })
             );
         }
+        println!("quo: {} {}", lhs_ring.get_ring().base_ring().format(&quo), i);
         lhs_ring.get_ring().add_assign_from_terms(&mut result, std::iter::once((quo, i)));
     }
     return Ok((result, lhs));

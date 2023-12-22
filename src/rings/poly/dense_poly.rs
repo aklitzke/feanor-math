@@ -390,22 +390,39 @@ impl<R, M: GrowableMemoryProvider<El<R>>> DivisibilityRing for DensePolyRingBase
         if let Some(d) = self.degree(rhs) {
             let lc = &rhs[d];
             let mut lhs_copy = self.memory_provider.get_new_init(lhs.len(), |i| self.base_ring.clone_el(&lhs[i]));
-            let quo = self.poly_div(&mut lhs_copy, rhs, |x| self.base_ring().checked_left_div(&x, lc))?;
+            println!("lc in clf: {}", self.base_ring().format(lc));
+            // println!("lc in cld: {}", RingRef::new(lhs).println(lc));
+            let left_div_lc = |x| {
+                let res = self.base_ring().checked_left_div(&x, lc);
+                println!("left_div_lc x: {}", self.base_ring().format(&x));
+                if res.is_some() {
+                    println!("left_div_lc res: {}", self.base_ring().format(res.as_ref().unwrap()));
+                } else {
+                    println!("left_div_lc res: None");
+                }
+                res
+            };
+            let quo = self.poly_div(&mut lhs_copy, rhs, left_div_lc)?;
             if self.is_zero(&lhs_copy) {
                 Some(quo)
             } else {
-                None
+                let mut s = String::new();
+                self.dbg(&lhs_copy, &mut std::fmt::Formatter::new(&mut s));
+                println!("lhs copy Zero: {}", s);
+                // None
+                Some(quo)
             }
         } else if self.is_zero(lhs) {
             Some(self.zero())
         } else {
+            println!("lhs zero to bein with");
             None
         }
     }
 }
 
 impl<R, M: GrowableMemoryProvider<El<R>>> EuclideanRing for DensePolyRingBase<R, M> 
-    where R: RingStore, R::Type: Field + CanonicalIso<R::Type>
+    where R: RingStore, R::Type: DivisibilityRing + CanonicalIso<R::Type>
 {
     fn euclidean_div_rem(&self, mut lhs: Self::Element, rhs: &Self::Element) -> (Self::Element, Self::Element) {
         let lc_inv = self.base_ring.invert(&rhs[self.degree(rhs).unwrap()]).unwrap();
