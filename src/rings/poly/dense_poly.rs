@@ -425,8 +425,16 @@ impl<R, M: GrowableMemoryProvider<El<R>>> EuclideanRing for DensePolyRingBase<R,
     where R: RingStore, R::Type: DivisibilityRing + CanonicalIso<R::Type>
 {
     fn euclidean_div_rem(&self, mut lhs: Self::Element, rhs: &Self::Element) -> (Self::Element, Self::Element) {
-        let lc_inv = self.base_ring.invert(&rhs[self.degree(rhs).unwrap()]).unwrap();
-        let quo = self.poly_div(&mut lhs, rhs, |x| Some(self.base_ring().mul_ref_snd(x, &lc_inv))).unwrap();
+        let degree = self.degree(rhs).unwrap();
+        let quo;
+        if let Some(lc_inv) = self.base_ring.invert(&rhs[degree]) {
+            quo = self.poly_div(&mut lhs, rhs, |x| Some(self.base_ring().mul_ref_snd(x, &lc_inv))).unwrap();
+        } else {
+            let ring = RingRef::new(self);
+            println!("inversion failed! ({}) ({})", ring.format(&lhs), ring.format(rhs));
+            quo = ring.clone_el(rhs);
+            assert!(false);
+        }
         return (quo, lhs);
     }
 

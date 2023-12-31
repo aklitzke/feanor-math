@@ -150,6 +150,7 @@ impl<const N: u64, const IS_FIELD: bool> DivisibilityRing for ZnBase<N, IS_FIELD
         if d == 1 {
             Some(self.mul(*lhs, rhs_inv))
         } else {
+            println!("not leftable! {} {}", lhs, rhs);
             None
         }
     }
